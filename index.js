@@ -3,7 +3,8 @@
 
 var canvas=document.getElementById('lifecanvas');
 var ctx=canvas.getContext("2d");
-
+CELL_WIDTH=20
+CELL_HEIGHT=20
 // 细胞的对象表示--类
 function Cell (zuobiao) {
 	this.state=0;
@@ -28,7 +29,20 @@ function Cell (zuobiao) {
 	}
 }
 
-var zuobiaos=[{x:0,y:0},{x:30,y:30},{x:80,y:80}]
+// 获得细胞坐标数组
+function getZuoBiaos () {
+	var zuobiaos=[];
+	for (var i = 0; i < 600/20; i++) {
+		x=i*20;
+		for (var j = 0; j < 600/20; j++) {
+			y=j*20;
+			zuobiaos.push({x:x,y:y});
+		};
+	};
+	return zuobiaos;
+}
+
+var zuobiaos=getZuoBiaos();
 var cells=[]
 for (var i = 0; i < zuobiaos.length; i++) {
 	var x=Cell(zuobiaos[i]);
