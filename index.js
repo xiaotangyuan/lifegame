@@ -1,5 +1,13 @@
-// 动画刷新方法
-// setInterval和setTimeout?
+// 开始、停止按钮
+var beginbtn=document.getElementById('begin');
+var stopbtn=document.getElementById('stop');
+beginbtn.onclick=function  () {
+	// alert('haha');
+	ac=setInterval('drawState(cells)',500);
+}
+stopbtn.onclick=function () {
+	clearInterval(ac);
+}
 
 var canvas=document.getElementById('lifecanvas');
 var ctx=canvas.getContext("2d");
@@ -42,20 +50,26 @@ function getZuoBiaos () {
 	return zuobiaos;
 }
 
-var zuobiaos=getZuoBiaos();
-var cells=[]
-for (var i = 0; i < zuobiaos.length; i++) {
-	var x=Cell(zuobiaos[i]);
-	cells.push(new Cell(zuobiaos[i]));
-};
 
-console.log(cells);
+// 获得坐标对象
+function getCells () {
+	var zuobiaos=getZuoBiaos();
+	var cells=[]
+	for (var i = 0; i < zuobiaos.length; i++) {
+		var x=Cell(zuobiaos[i]);
+		cells.push(new Cell(zuobiaos[i]));
+	};
+	return cells
+}
+
+var cells =getCells();
 
 // 画出图形
-for (var i = 0; i < cells.length; i++) {
-	cells[i].draw(ctx);
-
-};
-
+function drawState (cells) {
+	for (var i = 0; i < cells.length; i++) {
+		cells[i].draw(ctx);
+	};
+}
+// setInterval('drawState(cells)',1000);
 
 // ctx.fillRect(0,0,10,10);
