@@ -4,16 +4,19 @@ var stopbtn=document.getElementById('stop');
 beginbtn.onclick=function  () {
 	// alert('haha');
 	cells=random_cellstate(cells)
+	// drawBorders(cells);
 	ac=setInterval('drawState(cells)',500);
 }
 stopbtn.onclick=function () {
 	clearInterval(ac);
 }
 
+// ---------------------------------------
+
 var canvas=document.getElementById('lifecanvas');
 var ctx=canvas.getContext("2d");
-CELL_WIDTH=20
-CELL_HEIGHT=20
+CELL_WIDTH=10
+CELL_HEIGHT=10
 function getNum(n) {
 	// n为随机数的上限。
 	return Math.floor(Math.random() * ( n + 1));
@@ -24,8 +27,8 @@ function Cell (zuobiao) {
 	this.state=0;
 	this.futurestate=0;
 	this.zuobiao={x:zuobiao.x,y:zuobiao.y}
-	this.width=20;
-	this.height=20;
+	this.width=CELL_WIDTH;
+	this.height=CELL_WIDTH;
 	this.draw=function (ctx) {
 		// 将当前的状态赋值给旧状态，以给后续的细胞判断生命显示状态
 		// var state_pd=this.state;
@@ -43,9 +46,7 @@ function Cell (zuobiao) {
 			var color=this.color();
 			ctx.fillStyle=color;
 			ctx.fillRect(this.zuobiao.x,this.zuobiao.y,this.width,this.height);			
-
 		}
-
 	};
 	// 随机颜色，rgb值
 	this.color=function () {
@@ -88,15 +89,16 @@ function Cell (zuobiao) {
 		};
 		return 0;
 	}
+
 }
 
 // 获得细胞坐标数组
 function getZuoBiaos () {
 	var zuobiaos=[];
-	for (var i = 0; i < 600/20; i++) {
-		x=i*20;
-		for (var j = 0; j < 600/20; j++) {
-			y=j*20;
+	for (var i = 0; i < canvas.width/CELL_WIDTH; i++) {
+		x=i*CELL_WIDTH;
+		for (var j = 0; j < canvas.height/CELL_HEIGHT; j++) {
+			y=j*CELL_WIDTH;
 			zuobiaos.push({x:x,y:y});
 		};
 	};
@@ -145,12 +147,15 @@ function getCellFromCells (zuobiao) {
 // var g=getCellFromCells({x:0,y:0});
 // alert(g);
 
-// 产生部分活的细胞
-function makeLiveCells () {
-	
-	
+// 画出细胞的边框
+function drawBorders (cells) {
+	for (var i = 0; i < cells.length; i++) {
+		ctx.fillStyle='red';
+		ctx.strokeRect(cells[i].zuobiao.x,cells[i].zuobiao.y,cells[i].width,cells[i].height);
+		ctx.stroke();
+	};
 }
-
+drawBorders(cells);
 // 从一个坐标{x:0,y:0}得到邻居坐标
 function getNeighborsZuoBiao (zuobiao) {
 	var neighbors=[];
@@ -158,8 +163,8 @@ function getNeighborsZuoBiao (zuobiao) {
 	y=zuobiao.y;
 	// 一共8个
 	// [x-20,x,x+20],[y-20,y,y+20]
-	var xs=[x-20,x,x+20];
-	var ys=[y-20,y,y+20];
+	var xs=[x-CELL_WIDTH,x,x+CELL_WIDTH];
+	var ys=[y-CELL_WIDTH,y,y+CELL_WIDTH];
 	for (var i = 0; i < xs.length; i++) {
 		for (var j = 0; j < ys.length; j++) {
 			neighbors.push({x:xs[i],y:ys[j]});
@@ -179,7 +184,7 @@ function getNeighborsZuoBiao (zuobiao) {
 	clearN=[]
 	// 去掉x,y<0 >600的坐标
 	for (var i = 0; i < neighbors.length; i++) {
-		if (neighbors[i].x<0||neighbors[i].x>=600||neighbors[i].y>=600||neighbors[i].y<0) {
+		if (neighbors[i].x<0||neighbors[i].x>=canvas.width||neighbors[i].y>=canvas.height||neighbors[i].y<0) {
 			continue;
 		};
 		clearN.push(neighbors[i]);
