@@ -28,25 +28,24 @@ function Cell (zuobiao) {
 	this.height=20;
 	this.draw=function (ctx) {
 		// 将当前的状态赋值给旧状态，以给后续的细胞判断生命显示状态
-		var state_pd=this.state;
-		this.oldstate=this.state;
-		this.state=this.futurestate;
+		// var state_pd=this.state;
+		// this.oldstate=this.state;
 		// 判断是否绘制前先观察周围细胞状态，赋值未来下一次的生命状态
 		var num=getCellLiveNum(this.zuobiao);
+		this.futurestate=getFutureState(num);
 		console.log('----this.futurestate:-------',this.futurestate);
 		// 从全局状态表中得到之前的生存状态，判断是否绘制。
 		// 如果状态为0,表示已经死亡，不绘制
-					// 规则
-			// 1  周围有3个细胞，生
-			// 2  周围有2个细胞，保持之前的生存状态不变
-			// 3  其他情况为死亡
-		if (!state_pd) {
-			return;
+		if (!this.state) {
+			ctx.fillStyle='white';
+			ctx.fillRect(this.zuobiao.x,this.zuobiao.y,this.width,this.height);
 		}else{
 			var color=this.color();
 			ctx.fillStyle=color;
-			ctx.fillRect(this.zuobiao.x,this.zuobiao.y,this.width,this.height);
+			ctx.fillRect(this.zuobiao.x,this.zuobiao.y,this.width,this.height);			
+
 		}
+
 	};
 	// 随机颜色，rgb值
 	this.color=function () {
@@ -73,6 +72,21 @@ function Cell (zuobiao) {
 			num=num+cellsStates[i];
 		};		
 		return num;
+	}
+
+	// 获取未来的状态
+	this.getFutureState=function (num) {
+		// 规则
+		// 1  周围有3个细胞，生
+		// 2  周围有2个细胞，保持之前的生存状态不变
+		// 3  其他情况为死亡
+		if (num==3) {
+			return 1;
+		};
+		if (num==2) {
+			return this.state;
+		};
+		return 0;
 	}
 }
 
@@ -110,6 +124,10 @@ var cells =getCells();
 function drawState (cells) {
 	for (var i = 0; i < cells.length; i++) {
 		cells[i].draw(ctx);
+	};
+	// 循环一遍后，更新futurestate
+	for (var i = 0; i < cells.length; i++) {
+		cells[i].state=cells[i].futurestate;
 	};
 }
 
