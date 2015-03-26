@@ -2,10 +2,14 @@
 var beginbtn=document.getElementById('begin');
 var stopbtn=document.getElementById('stop');
 beginbtn.onclick=function  () {
-	// alert('haha');
-	cells=random_cellstate(cells)
+	clearDesk(ctx,canvas);
+	// 随机赋予cell状态
+	random_cellstate(cells);
 
-	ac=setInterval('drawState(cells)',500);
+	// 画出细胞
+	draw_cells(cells);
+
+	// ac=setInterval('drawState(cells)',500);
 }
 stopbtn.onclick=function () {
 	clearInterval(ac);
@@ -24,6 +28,12 @@ setNeighbors(cells,canvas);
 
 // 画出格子
 draw_house();
+// draw_cell(cells[3]);
+	// 随机赋予cell状态
+	random_cellstate(cells);
+
+	// 画出细胞
+	draw_cells(cells);
 
 // 方法定义：画出格子
 function draw_house(){
@@ -35,7 +45,24 @@ function draw_house(){
 }
 // ctx.fillRect(107,105,200,200);
 
+// 根据cell的状态判断是填充还是画边框
+function draw_cell (cell) {
+	var zb=cell.zuobiao;
+	if (cell.state) {
+		ctx.fillStyle=randomColor();
+		ctx.fillRect(zb.x,zb.y,CELL_WIDTH,CELL_HEIGHT);
+	}else{
+		ctx.strokeStyle="red";
+		ctx.strokeRect(zb.x,zb.y,CELL_WIDTH,CELL_HEIGHT);
+	}
+}
 
+// 画出所有cells
+function draw_cells(cells) {
+	for (var i = 0; i < cells.length; i++) {
+		draw_cell (cells[i]);
+	};
+}
 
 
 // 方法定义：让每个细胞获得自己的邻居细胞
@@ -57,25 +84,15 @@ function Cell (zuobiao) {
 
 	// 获取细胞生存环境活的细胞数字
 	this.getCellLiveNum=function () {
-		var thezuobiao=this.zuobiao;
-		var NeighborZuoBiaos=getNeighborsZuoBiao(thezuobiao);
-		var NeighborCells=getNeighborsCells(NeighborZuoBiaos);
-		var cellsStates=[];
-			// console.log("-----thizuobiao--------",thezuobiao);
-		// console.log("-------------",NeighborCells);
-		for (var i = 0; i < NeighborCells.length; i++) {
-			// console.log("--",i,NeighborCells[i]);
-			cellsStates.push(NeighborCells[i].state);
+		var nbc=this.neighborsOfCells;
+		var num=0;
+		for (var i = 0; i < nbc.length; i++) {
+			num=num+nbc.state;
 		};
-
-		var num=0
-		for (var i = 0; i < cellsStates.length; i++) {
-			num=num+cellsStates[i];
-		};		
-		return num;
+		return num
 	}
 
-	// 刷新未来的状态
+	// 刷新得到未来的状态
 	this.refreshFutureState=function () {
 		var num=this.getCellLiveNum();
 		// 规则
@@ -265,4 +282,9 @@ function random_cellstate(cells) {
 		cells[i].state=s;
 	};
 	return cells
+}
+
+// 去除界面
+function clearDesk(ctx,canvas) {
+	ctx.clearRect(0,0,canvas.width,canvas.height);
 }
