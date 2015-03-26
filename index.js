@@ -1,15 +1,8 @@
 // 开始、停止按钮
 var beginbtn=document.getElementById('begin');
 var stopbtn=document.getElementById('stop');
-beginbtn.onclick=function  () {
-	clearDesk(ctx,canvas);
-	// 随机赋予cell状态
-	random_cellstate(cells);
-
-	// 画出细胞
-	draw_cells(cells);
-
-	// ac=setInterval('drawState(cells)',500);
+beginbtn.onclick=function (){
+	ac=setInterval('drawall()',500);
 }
 stopbtn.onclick=function () {
 	clearInterval(ac);
@@ -28,12 +21,21 @@ setNeighbors(cells,canvas);
 
 // 画出格子
 draw_house();
-// draw_cell(cells[3]);
-	// 随机赋予cell状态
-	random_cellstate(cells);
 
-	// 画出细胞
+// 随机赋予cell状态
+random_cellstate(cells);
+
+function drawall () {
+		// body...
+	clearDesk(ctx,canvas);
+	refreshAllFutureState(cells);
+		// 画出细胞
 	draw_cells(cells);
+		// console.log('---');
+		// console.log('+++');
+
+	setAllFutureStateToState(cells);
+}
 
 // 方法定义：画出格子
 function draw_house(){
@@ -64,6 +66,26 @@ function draw_cells(cells) {
 	};
 }
 
+// 刷新未来状态
+function refreshAllFutureState(cells) {
+	// console.log(cells.length);
+	for (var i = 0; i < cells.length; i++) {
+		cells[i].refreshFutureState();
+	};
+}
+
+// 将未来状态赋值到当前状态
+function setAllFutureStateToState(cells) {
+	// alert('fds');
+	// console.log('set');
+	// console.log(cells.length);
+	for (var i = 0; i < cells.length; i++) {
+		cells[i].setFutureStateToState();
+		// console.log('将未来状态赋值到当前状态:',cells[i].state);
+	};
+}
+
+
 
 // 方法定义：让每个细胞获得自己的邻居细胞
 function setNeighbors(cells,canvas) {
@@ -75,7 +97,7 @@ function setNeighbors(cells,canvas) {
 // 细胞的对象表示--类
 function Cell (zuobiao) {
 	this.oldstate=0;
-	this.state=0;
+	this.state=1;
 	this.futurestate=0;
 	this.zuobiao={x:zuobiao.x,y:zuobiao.y}
 	this.width=CELL_WIDTH;
@@ -85,33 +107,46 @@ function Cell (zuobiao) {
 	// 获取细胞生存环境活的细胞数字
 	this.getCellLiveNum=function () {
 		var nbc=this.neighborsOfCells;
-		var num=0;
+		// console.log(nbc.length);
+		var nums=0;
+		// var nums=[];
 		for (var i = 0; i < nbc.length; i++) {
-			num=num+nbc.state;
+			nums=nums+nbc[i].state;
+			// nums.push(nbc[i].state);
 		};
-		return num
+		// console.log(nums);
+		return nums
 	}
 
 	// 刷新得到未来的状态
 	this.refreshFutureState=function () {
 		var num=this.getCellLiveNum();
+		// console.log(num);
 		// 规则
 		// 1  周围有3个细胞，生
 		// 2  周围有2个细胞，保持之前的生存状态不变
 		// 3  其他情况为死亡
 		if (num==3) {
 			this.futurestate=1;
+			// console.log(this.zuobiao,':未来状态为：',this.futurestate);
 			return;
 		};
 		if (num==2) {
 			this.futurestate=this.state;
+			// console.log(this.zuobiao,':未来状态为：',this.futurestate);
 			return;
 		};
 		if (num!=2&&num!=3) {
 			this.futurestate=0;
+			// console.log(this.zuobiao,':未来状态为：',this.futurestate);
 			return;
 		};
 		
+	}
+
+	this.setFutureStateToState=function () {
+		this.state=this.futurestate;
+
 	}
 
 }
@@ -171,7 +206,7 @@ function UtilOfCells (cells,canvas) {
 	this.setNeighborsPerCell=function () {
 		var cells=this.cells;
 		for (var i = 0; i < cells.length; i++) {
-			cells[i].neighborsOfCells.push(this.getNeighborsCells(cells[i]));
+			cells[i].neighborsOfCells=this.getNeighborsCells(cells[i]);
 		};
 	}
 
@@ -248,7 +283,7 @@ function test_UtilOfCells (cells,canvas) {
 	};
 }
 
-test_UtilOfCells(cells,canvas);
+// test_UtilOfCells(cells,canvas);
 
 
 
