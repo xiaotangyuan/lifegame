@@ -2,14 +2,13 @@
 var beginbtn=document.getElementById('begin');
 var stopbtn=document.getElementById('stop');
 beginbtn.onclick=function (){
-	ac=setInterval('drawall()',500);
+	ac=setInterval('drawall()',200);
 }
 stopbtn.onclick=function () {
 	clearInterval(ac);
 }
 
 // ---------------------------------------
-
 var canvas=document.getElementById('lifecanvas');
 var ctx=canvas.getContext("2d");
 var CELL_WIDTH=10
@@ -33,7 +32,6 @@ function drawall () {
 	draw_cells(cells);
 		// console.log('---');
 		// console.log('+++');
-
 	setAllFutureStateToState(cells);
 }
 
@@ -51,7 +49,8 @@ function draw_house(){
 function draw_cell (cell) {
 	var zb=cell.zuobiao;
 	if (cell.state) {
-		ctx.fillStyle=randomColor();
+		// ctx.fillStyle=randomColor();
+		ctx.fillStyle="green";
 		ctx.fillRect(zb.x,zb.y,CELL_WIDTH,CELL_HEIGHT);
 	}else{
 		ctx.strokeStyle="red";
@@ -76,16 +75,11 @@ function refreshAllFutureState(cells) {
 
 // 将未来状态赋值到当前状态
 function setAllFutureStateToState(cells) {
-	// alert('fds');
-	// console.log('set');
-	// console.log(cells.length);
 	for (var i = 0; i < cells.length; i++) {
 		cells[i].setFutureStateToState();
 		// console.log('将未来状态赋值到当前状态:',cells[i].state);
 	};
 }
-
-
 
 // 方法定义：让每个细胞获得自己的邻居细胞
 function setNeighbors(cells,canvas) {
@@ -93,15 +87,14 @@ function setNeighbors(cells,canvas) {
 	util.setNeighborsPerCell();
 }
 
-
 // 细胞的对象表示--类
 function Cell (zuobiao) {
 	this.oldstate=0;
 	this.state=1;
 	this.futurestate=0;
 	this.zuobiao={x:zuobiao.x,y:zuobiao.y}
-	this.width=CELL_WIDTH;
-	this.height=CELL_WIDTH;
+	// this.width=CELL_WIDTH;
+	// this.height=CELL_WIDTH;
 	this.neighborsOfCells=[];
 
 	// 获取细胞生存环境活的细胞数字
@@ -140,15 +133,12 @@ function Cell (zuobiao) {
 			this.futurestate=0;
 			// console.log(this.zuobiao,':未来状态为：',this.futurestate);
 			return;
-		};
-		
+		};	
 	}
 
 	this.setFutureStateToState=function () {
 		this.state=this.futurestate;
-
 	}
-
 }
 
 // 产生细胞对象
@@ -282,20 +272,6 @@ function test_UtilOfCells (cells,canvas) {
 		console.log(cells[i]);
 	};
 }
-
-// test_UtilOfCells(cells,canvas);
-
-
-
-
-
-
-
-
-
-
-
-
 
 // ---------------------------工具-----------------------
 // 0-n的随机数
