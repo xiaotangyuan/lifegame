@@ -1,11 +1,28 @@
 // 开始、停止按钮
 var beginbtn=document.getElementById('begin');
 var stopbtn=document.getElementById('stop');
+var sjbtn=document.getElementById('sj');
+function drawall () {
+		// body...
+	clearDesk(ctx,canvas);
+	refreshAllFutureState(cells);
+		// 画出细胞
+	draw_cells(cells);
+		// console.log('---');
+		// console.log('+++');
+	setAllFutureStateToState(cells);
+}
+var xunhuansj;
 beginbtn.onclick=function (){
 	ac=setInterval('drawall()',200);
+	xunhuansj=ac;
 }
 stopbtn.onclick=function () {
 	clearInterval(ac);
+}
+sjbtn.onclick=function () {
+	random_cellstate(cells);
+	draw_cells(cells);
 }
 
 // ---------------------------------------
@@ -18,42 +35,47 @@ var cells=new MakeCells(canvas).getCells();
 // 让每个细胞获得自己的邻居细胞
 setNeighbors(cells,canvas);
 
-// 画出格子
-draw_house();
+// 画出细胞初始状态
+draw_cells(cells);
 
 // 随机赋予cell状态
-random_cellstate(cells);
+// random_cellstate(cells);
 
-function drawall () {
-		// body...
-	clearDesk(ctx,canvas);
-	refreshAllFutureState(cells);
-		// 画出细胞
-	draw_cells(cells);
-		// console.log('---');
-		// console.log('+++');
-	setAllFutureStateToState(cells);
+// 监听鼠标,翻转状态。
+canvas.onclick=function (event) {
+	// alert(event);
+	// console.log(event);
+	var clickxy=[event.layerX,event.layerY];
+	// console.log(clickxy);
+	
+	var cellx=parseInt(clickxy[0]/CELL_WIDTH)*CELL_WIDTH;
+	var celly=parseInt(clickxy[1]/CELL_HEIGHT)*CELL_HEIGHT;
+	// console.log(cellx,celly);
+	var zb={x:cellx,y:celly};
+	var cell=new UtilOfCells(cells,canvas).getCellFromZuobiao(zb,cells);
+	cell.state=!cell.state;
+	// draw_cells(cells);
+	// 重新绘制当前位置的细胞
+	draw_cell (cell);
+	// 暂停执行循环
+	clearInterval(xunhuansj);
 }
 
-// 方法定义：画出格子
-function draw_house(){
-	ctx.strokeStyle="gray";
-	for (var i = 0; i < cells.length; i++) {
-		var zb=cells[i].zuobiao;
-		ctx.strokeRect(zb.x,zb.y,CELL_WIDTH,CELL_HEIGHT);
-	};
-}
+
 // ctx.fillRect(107,105,200,200);
 
 // 根据cell的状态判断是填充还是画边框
 function draw_cell (cell) {
 	var zb=cell.zuobiao;
+	// console.log(cell.state);
+	ctx.clearRect(cell.zuobiao.x,cell.zuobiao.y,CELL_WIDTH,CELL_HEIGHT);
 	if (cell.state) {
 		// ctx.fillStyle=randomColor();
+		ctx.clearRect(cell.zuobiao.x,cell.zuobiao.y,CELL_WIDTH,CELL_HEIGHT);
 		ctx.fillStyle="green";
 		ctx.fillRect(zb.x,zb.y,CELL_WIDTH,CELL_HEIGHT);
 	}else{
-		ctx.strokeStyle="red";
+		// ctx.strokeStyle="red";
 		ctx.strokeRect(zb.x,zb.y,CELL_WIDTH,CELL_HEIGHT);
 	}
 }
@@ -90,7 +112,7 @@ function setNeighbors(cells,canvas) {
 // 细胞的对象表示--类
 function Cell (zuobiao) {
 	this.oldstate=0;
-	this.state=1;
+	this.state=0;
 	this.futurestate=0;
 	this.zuobiao={x:zuobiao.x,y:zuobiao.y}
 	// this.width=CELL_WIDTH;
@@ -222,7 +244,7 @@ function UtilOfCells (cells,canvas) {
 				return cells[i];
 			};
 		};
-		console.loe("未找到该坐标相对应的细胞:",zuobiao);
+		console.log("未找到该坐标相对应的细胞:",zuobiao);
 		return "未找到该坐标相对应的细胞";
 	}
 	// 由坐标获得相邻坐标
